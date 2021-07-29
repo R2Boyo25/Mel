@@ -388,7 +388,7 @@ if __name__ == "__main__":
         break
 
     with open("disabled.txt", "r") as f:
-        a = f.read().split('\n')
+        a = f.read().strip('\n').split('\n')
 
     for ext in exts:
         try:
