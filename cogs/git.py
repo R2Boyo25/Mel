@@ -20,10 +20,10 @@ class GitCog(commands.Cog):
 
                 if command.split()[0] == "commit":
 
-                    command1 = " ".join(command.split()[2:])
-                    command1 = "git commit -m".split() + [f'{command1}']
+                    command2 = " ".join(command.split()[2:])
+                    command1 = "git commit -m".split() + [f'{command2}']
 
-                    a = subprocess.check_output("git commit -m".split() + [f'{command1}'])#, stderr=subprocess.STDOUT, shell=True, timeout=3)
+                    a = subprocess.check_output("git commit -m".split() + [f'{command2}'])#, stderr=subprocess.STDOUT, shell=True, timeout=3)
 
                 else:
 
