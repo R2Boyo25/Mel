@@ -23,7 +23,7 @@ class GitCog(commands.Cog):
                     command2 = " ".join(command.split()[2:])
                     command1 = "git commit -m".split() + [f'{command2}']
 
-                    a = subprocess.check_output("git commit -m".split() + [f'{command2}'.strip("\"")])#, stderr=subprocess.STDOUT, shell=True, timeout=3)
+                    a = subprocess.check_output("git commit -m".split() + [f'{command2}'.strip("\"")], timeout=5)
 
                 else:
 
