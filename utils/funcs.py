@@ -18,7 +18,7 @@ async def get_prefix(bot, message):
     else:
 
         # Open prefixes.json and save it to keys
-        with open("/home/pi/botfolder/prefixes.json") as json_file:
+        with open("prefixes.json") as json_file:
 
             keys = json.load(json_file)
 
