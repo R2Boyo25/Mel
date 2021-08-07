@@ -117,41 +117,9 @@ async def on_ready():
 
         del errors[i]
 
-@bot.command("load", hidden=True)
-@commands.is_owner()
-async def loadExtension(ctx, extension):
-
-    global cogs
-
-    ext = extension
-
-    try:
-
-        isLoaded = cogs[ext]
-    
-    except:
-
-        isLoaded = False
-
-    if not isLoaded:
-
-        try:
-            bot.load_extension(f'cogs.{ext.replace(".py", "")}')
-            print(f"Loaded {ext}")
-            cogs[ext] = True
-
-            await ctx.send(f":white_check_mark: Loaded {ext}")
-
-        except Exception as error:
-            print(f"Failed to load {ext}")
-            cogs[ext] = False
-
-            embed=discord.Embed(title=f"Failed to load {ext}", description="```py\n{}\n```".format(error), color=0x9c0b21)
-            await ctx.send(embed=embed)
-    
-    else:
-
-        await ctx.send(f":x: Failed to load {ext}, {ext} already loaded")
+for filename in os.listdir('./cogs'): # For every file that is in the foder cogs
+  if filename.endswith('.py'):                                                 # If the name of the file ends with .py
+    bot.load_extension(f'cogs.{filename[:-3]}')                                                                       # Load the filename as extension
 
 @bot.command("reload", hidden=True)
 @commands.is_owner()
