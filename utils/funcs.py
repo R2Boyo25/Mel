@@ -29,7 +29,10 @@ async def get_prefix(bot, message):
 
         else:
 
-            prefixes = [prefix]
+            if str(type(prefix)) == '<class \'list\'>':
+                prefixes = [i for i in prefix]
+            else:
+                prefixes = [prefix]
 
     # If we are in a guild, we allow for the user to mention us or use the custom prefix.
     return commands.when_mentioned_or(*prefixes)(bot, message)
