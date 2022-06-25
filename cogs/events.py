@@ -26,16 +26,15 @@ def setup(bot):
         await procmessage.processMessage(message, bot)
 
         if str(message.content).replace(' ', '') == bot.user.mention: 
-            await message.channel.send("You poinged? do .help (or [yourserverseprefifix]help)")
+            await message.channel.send("You pinged? do .help (or [yourserverseprefifix]help)")
 
-        if not message.content[1]=='.':
+        if not message.content[1] == '.':
             await bot.process_commands(message)
 
     @bot.event
     async def on_member_join(ctx):
         if ctx.guild.system_channel:
             channel = ctx.guild.system_channel
-            print(f"Join_channel found for {ctx.guild}")
         else:
             channel = ctx.author
         
