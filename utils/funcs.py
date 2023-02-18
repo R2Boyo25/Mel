@@ -1,11 +1,14 @@
-import discord, json
-from discord.ext import commands
-from database import Database as db
+import discord # type: ignore
+import json
+from discord.ext import commands # type: ignore
+from utils.jdb import JSONDatabase as jdb
+from utils.serverconf import ServerConf as sc
+from typing import Any
 
 class ConfigError(Exception):
     pass
 
-async def get_prefix(bot, message):
+async def get_prefix(bot: commands.Bot, message: discord.Message) -> Any:
 
     prefix = config('prefix')
 
@@ -37,12 +40,12 @@ async def get_prefix(bot, message):
     # If we are in a guild, we allow for the user to mention us or use the custom prefix.
     return commands.when_mentioned_or(*prefixes)(bot, message)
 
-def config(key):
+def config(key: str) -> Any:
     try:
 
         try:
         
-            cdb = db("config.json")
+            cdb = jdb("config.json")
 
         except:
 

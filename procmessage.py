@@ -1,18 +1,19 @@
-import discord
+import discord # type: ignore
+import random
 from utils.funcs import *
-from database import Database as db
+from utils.jdb   import JSONDatabase as jdb
 
-async def processMessage(message, bot):
+async def processMessage(message: discord.Message, bot: commands.Bot) -> None:
     pass # remove this line once you add custom handlers
 
     # add your own message handlers here.
 
     # Example
 
-    # await xp(message, bot) 
+    # await xp(message) 
 
 # example message handler thing
-async def xp(message):
+async def xp(message: discord.Message) -> None:
     if len(message.content) > 0:
 
         if message.content[0] in "!/\?|.,<{}[]-=+":
@@ -20,7 +21,7 @@ async def xp(message):
         
     pxp = int(random.randint(5, 20) * 2)
 
-    data = db("rank.json")
+    data = jdb("rank.json")
 
     a = str(message.author.id)
 

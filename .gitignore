@@ -1,4 +1,8 @@
-*__pycache__
+__pycache__
 .vscode
 discord.txt
 config.json
+*~
+venv
+configs
+.mypy_cache

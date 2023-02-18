@@ -1,33 +1,21 @@
-import discord
-from discord.ext import commands
+import discord # type: ignore
+from discord.ext import commands # type: ignore
 from utils.funcs import *
-from database import Database as db
 import subprocess
 
 #Example Cog
 class GitCog(commands.Cog):
     '''Git Commands'''
-    def __init__(self, bot):
+    def __init__(self, bot: commands.Bot):
         self.bot = bot
 
     @commands.command("git")
     @commands.is_owner()
-    async def git(self, ctx, * , command):
-
+    async def git(self, ctx: commands.Context, *, command: str) -> None:
         try:
+            command1 = ("git " + command).split()
 
-            if command.split()[0] == "commit":
-
-                command2 = " ".join(command.split()[2:])
-                command1 = "git commit -m".split() + [f'{command2}']
-
-                a = subprocess.check_output("git commit -m".split() + [f'{command2}'.strip("\"")], timeout=5)
-
-            else:
-
-                command1 = ("git " + command).split()
-
-                a = subprocess.check_output(("git " + command).split(), stderr=subprocess.STDOUT)
+            a = subprocess.check_output(("git " + command).split(), stderr=subprocess.STDOUT)
 
             b = a.decode().replace('```', '\`\`\`')
 
@@ -38,6 +26,6 @@ class GitCog(commands.Cog):
 
         await ctx.send(embed=embed)
 
-def setup(bot):
-    bot.add_cog(GitCog(bot))
+async def setup(bot: commands.Bot) -> None:
+    await bot.add_cog(GitCog(bot))
     

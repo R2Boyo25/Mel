@@ -1,2 +1,2 @@
 discord.py
-discord-pretty-help==1.1.0
+discord-pretty-help
