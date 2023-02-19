@@ -1,6 +1,6 @@
 import json
 import os
-from typing import Any
+from typing import Any, Optional
 
 
 class JSONDatabase(object):
@@ -24,7 +24,13 @@ class JSONDatabase(object):
         self.db[str(key)] = value
         self.dumpdb()
 
-    def get(self, key: str) -> Any:
+    def get(self, key: str, default: Optional[Any] = None) -> Any:
+        if key not in self.db:
+            if default:
+                return default
+
+            raise ValueError(f"No value set for {key} in DB and no default value passed to get()")
+        
         return self.db[key]
 
     def delete(self, key: str) -> None:
