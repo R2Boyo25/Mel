@@ -127,7 +127,7 @@ async def on_ready() -> None:
                 print(f"Didn't load disabled extension {ext}")
                 cogs[ext.replace(".py", "")] = False
 
-            if se.startswith("Extension 'cogs.") and se.endswith("' is already loaded"):
+            elif se.startswith("Extension 'cogs.") and se.endswith("' is already loaded"):
                 continue
                 
             else:
