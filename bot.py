@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+
 import os
 
 if not os.path.exists("./config.json"):
@@ -7,6 +8,9 @@ if not os.path.exists("./config.json"):
                                       
     print("This is the first run of the bot,\nYou need to fill in the configuration\noptions in config.json for the bot to function")
     quit()
+    
+import sys
+sys.path = sys.path + ["."]
 
 import traceback
 import discord # type: ignore
@@ -35,9 +39,6 @@ logger.addHandler(handler)
 cogs = {}
 
 def print(*messages: str) -> None:
-
-    global logger
-
     logger.info(" ".join(messages))
 
     __builtins__.print(*messages)
@@ -104,6 +105,9 @@ async def on_ready() -> None:
         a = f.read().strip('\n').split('\n')
 
     for ext in exts:
+        if ext.endswith("~"):
+            continue
+        
         try:
             if ext.replace(".py", "") in a:
                 raise Exception("DisabledExtension")
