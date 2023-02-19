@@ -11,7 +11,7 @@ class JSONDatabase(object):
        if os.path.exists(location):
            self._load()
        else:
-            raise Exception(f"File \"{self.location}\" could not be found")
+           self.db = {}
 
     def _load(self) -> None:
         self.db = json.load(open(self.location , "r"))

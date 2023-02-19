@@ -107,6 +107,9 @@ async def on_ready() -> None:
     for ext in exts:
         if ext.endswith("~"):
             continue
+
+        if ext.startswith("#") and ext.endswith("#"):
+            continue
         
         try:
             if ext.replace(".py", "") in a:
