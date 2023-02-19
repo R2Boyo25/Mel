@@ -1,16 +1,18 @@
-import discord # type: ignore
+import discord  # type: ignore
 import json
-from discord.ext import commands # type: ignore
+from discord.ext import commands  # type: ignore
 from utils.jdb import JSONDatabase as jdb
 from utils.serverconf import ServerConf as sc
 from typing import Any
 
+
 class ConfigError(Exception):
     pass
 
+
 async def get_prefix(bot: commands.Bot, message: discord.Message) -> Any:
 
-    prefix = config('prefix')
+    prefix = config("prefix")
 
     # Check to see if we are outside of a guild. e.g DM's etc.
     if not message.guild:
@@ -32,7 +34,7 @@ async def get_prefix(bot: commands.Bot, message: discord.Message) -> Any:
 
         else:
 
-            if str(type(prefix)) == '<class \'list\'>':
+            if str(type(prefix)) == "<class 'list'>":
                 prefixes = [i for i in prefix]
             else:
                 prefixes = [prefix]
@@ -40,11 +42,12 @@ async def get_prefix(bot: commands.Bot, message: discord.Message) -> Any:
     # If we are in a guild, we allow for the user to mention us or use the custom prefix.
     return commands.when_mentioned_or(*prefixes)(bot, message)
 
+
 def config(key: str) -> Any:
     try:
 
         try:
-        
+
             cdb = jdb("config.json")
 
         except:
@@ -58,14 +61,15 @@ def config(key: str) -> Any:
         except:
 
             raise ConfigError(f"Config missing {key}")
-    
+
     except ConfigError as e:
 
         print(e)
         quit()
 
+
 # Load Config
 
-ErrorChannel = int(config('logChannel'))
-logChannel = int(config('errorChannel'))
-TOKEN = config('token')
+ErrorChannel = int(config("logChannel"))
+logChannel = int(config("errorChannel"))
+TOKEN = config("token")

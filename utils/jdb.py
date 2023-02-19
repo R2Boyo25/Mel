@@ -2,19 +2,20 @@ import json
 import os
 from typing import Any
 
+
 class JSONDatabase(object):
     def __init__(self, location: str):
         self.location = os.path.expanduser(location)
         self.load(self.location)
 
     def load(self, location: str) -> None:
-       if os.path.exists(location):
-           self._load()
-       else:
-           self.db = {}
+        if os.path.exists(location):
+            self._load()
+        else:
+            self.db = {}
 
     def _load(self) -> None:
-        self.db = json.load(open(self.location , "r"))
+        self.db = json.load(open(self.location, "r"))
 
     def dumpdb(self) -> None:
         json.dump(self.db, open(self.location, "w+"), indent=4)
@@ -39,8 +40,8 @@ class JSONDatabase(object):
     def pop(self, key: str) -> Any:
         a = self.db.pop(key)
         self.dumpdb()
-        
+
         return a
-    
+
     def keys(self) -> Any:
         return self.db.keys()

@@ -1,11 +1,12 @@
-import discord # type: ignore
-from discord.ext import commands # type: ignore
+import discord  # type: ignore
+from discord.ext import commands  # type: ignore
 from utils.funcs import *
 import subprocess
 
-#Example Cog
+# Example Cog
 class GitCog(commands.Cog):
-    '''Git Commands'''
+    """Git Commands"""
+
     def __init__(self, bot: commands.Bot):
         self.bot = bot
 
@@ -15,17 +16,19 @@ class GitCog(commands.Cog):
         try:
             command1 = ("git " + command).split()
 
-            a = subprocess.check_output(("git " + command).split(), stderr=subprocess.STDOUT)
+            a = subprocess.check_output(
+                ("git " + command).split(), stderr=subprocess.STDOUT
+            )
 
-            b = a.decode().replace('```', '\`\`\`')
+            b = a.decode().replace("```", "\`\`\`")
 
         except subprocess.CalledProcessError as exc:
             b = str(exc.returncode) + " " + exc.output.decode()
 
-        embed = discord.Embed(title = " ".join(command1), description=f"```\n{b}\n```")
+        embed = discord.Embed(title=" ".join(command1), description=f"```\n{b}\n```")
 
         await ctx.send(embed=embed)
 
+
 async def setup(bot: commands.Bot) -> None:
     await bot.add_cog(GitCog(bot))
-    
