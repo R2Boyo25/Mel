@@ -48,16 +48,19 @@ class Config(commands.Cog):
                 await ctx.send(
                     f"Prefix for **{ctx.guild.name}** is '{data.get(str(ctx.guild.id))}'"
                 )
+                
             else:
                 await ctx.send(
                     f"**{ctx.guild.name}** does not have a custom prefix yet, set one with `.prefix newprefix`"
                 )
-        if ctx.author.guild_permissions.manage_guild:
+                
+        elif ctx.author.guild_permissions.manage_guild:
             if len(prefix) > 1:
                 await ctx.send(
                     f'The bot does not support prefixes longer than 1 character (as in, the bot breaks), your prefix has been shortened to "{prefix[0]}"'
                 )
             data.set(str(ctx.guild.id), prefix[0])
+            
         else:
             await ctx.send("You do not have permission to change this server's prefix.")
 

@@ -4,44 +4,47 @@ import os
 from utils.funcs import *
 from utils.jdb import JSONDatabase as jdb
 from utils.serverconf import ServerConf as sc
-import procmessage
 
+class Events(commands.Cog):
+    "Background listeners that allow the bot to do what it does."
 
-async def setup(bot: commands.Bot) -> None:
-    @bot.event
-    async def on_ready() -> None:
-        channel = bot.get_channel(logChannel)
+    def __init__(self, bot: commands.Bot):
+        self.bot = bot
+
+    @commands.Cog.listener()
+    async def on_ready(self) -> None:
+        channel = self.bot.get_channel(logChannel)
         msg = await channel.send("Bot Has Rebooted")
 
-        users = len(set(bot.get_all_members()))
+        users = len(set(self.bot.get_all_members()))
 
-        print("logged in as {}".format(bot.user))
+        print("logged in as {}".format(self.bot.user))
 
-        status = f"over {len(bot.guilds)} servers, {users} users | .help"
-        await bot.change_presence(
+        prefix = jdb("prefixes.json").get(str(message.guild.id), config("prefix"))
+        status = f"over {len(self.bot.guilds)} servers, {users} users | {prefix}help"
+        await self.bot.change_presence(
             activity=discord.Activity(type=discord.ActivityType.watching, name=status)
         )
 
-    @bot.event
-    async def on_message(message: discord.Message) -> None:
-        if message.author == bot.user:
+    @commands.Cog.listener()
+    async def on_message(self, message: discord.Message) -> None:
+        if message.author == self.bot.user:
             return
 
         if not message.content:
             return
 
-        await procmessage.processMessage(message, bot)
-
-        if str(message.content).replace(" ", "") == bot.user.mention:
-            prefix = jdb("prefixes.json").get(str(message.guild.id))
+        prefix = jdb("prefixes.json").get(str(message.guild.id), config("prefix"))
+        
+        if str(message.content).replace(" ", "") == self.bot.user.mention:
             await message.channel.send(f"You pinged? do {prefix}help)")
 
-        if not len(message.content) < 2:
-            if not message.content[1] == ".":
-                await bot.process_commands(message)
+        elif not len(message.content) < 2:
+            if not message.content[1] == prefix:
+                await self.bot.process_commands(message)
 
-    @bot.event
-    async def on_member_join(ctx: commands.Context) -> None:
+    @commands.Cog.listener()
+    async def on_member_join(self, ctx: commands.Context) -> None:
         if ctx.guild.system_channel:
             channel = ctx.guild.system_channel
 
@@ -72,8 +75,8 @@ async def setup(bot: commands.Bot) -> None:
         embed.set_thumbnail(url=joinurl)
         await channel.send(embed=embed)
 
-    @bot.event
-    async def on_member_remove(ctx: commands.Context) -> None:
+    @commands.Cog.listener()
+    async def on_member_remove(self, ctx: commands.Context) -> None:
         if ctx.guild.system_channel:
             print(f"Leave_channel found for {ctx.guild}")
 
@@ -102,9 +105,9 @@ async def setup(bot: commands.Bot) -> None:
         embed.set_thumbnail(url=leaveurl)
         await ctx.guild.system_channel.send(embed=embed)
 
-    @bot.event
-    async def on_guild_join(guild: discord.Guild) -> None:
-        log = bot.get_channel(logChannel)
+    @commands.Cog.listener()
+    async def on_guild_join(self, guild: discord.Guild) -> None:
+        log = self.bot.get_channel(logChannel)
 
         embed = discord.Embed(
             title="Server joined!",
@@ -132,3 +135,13 @@ async def setup(bot: commands.Bot) -> None:
         )
 
         await log.send(embed=embed)
+
+
+async def setup(bot: commands.Bot) -> None:
+
+    # this is here to prevent the bot from automatically processing commands.
+    @bot.event
+    async def on_message(ctx: commands.Context) -> None:
+        pass
+    
+    await bot.add_cog(Events(bot))

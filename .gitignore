@@ -1,8 +1,8 @@
 __pycache__
 .vscode
 discord.txt
-config.json
 *~
+*.json
 venv
 configs
 .mypy_cache
