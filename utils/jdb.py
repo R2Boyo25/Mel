@@ -27,10 +27,12 @@ class JSONDatabase(object):
     def get(self, key: str, default: Optional[Any] = None) -> Any:
         if key not in self.db:
             if default is None:
-                raise ValueError(f"No value set for {key} in DB and no default value passed to get()")
+                raise ValueError(
+                    f"No value set for {key} in DB and no default value passed to get()"
+                )
 
             return default
-        
+
         return self.db[key]
 
     def delete(self, key: str) -> None:

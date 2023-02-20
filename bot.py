@@ -1,7 +1,21 @@
 #!/usr/bin/env python
 
+import sys
 import os
+import shutil
 
+if len(sys.argv) == 1:
+    sys.argv.append(os.path.abspath(os.getcwd()))
+
+if len(sys.argv) >= 2:
+    newdir = os.path.abspath(os.path.expanduser(sys.argv[1]))
+    os.system(f'{sys.executable} -m venv "{newdir}/venv"')
+    shutil.copyfile(os.path.dirname(os.path.abspath(__file__)) + "/activate_this.py", newdir + "/venv/bin/activate_this.py")
+    sys.path = [newdir] + sys.path
+    exec(open(newdir + "/venv/bin/activate_this.py").read(), {'__file__': newdir + "/venv/bin/activate_this.py"})
+    os.chdir(newdir)
+    os.system(f'./venv/bin/pip3 install -r requirements.txt')
+    
 if not os.path.exists("./config.json"):
     with open("./config.json", "w") as f:
         f.write(
@@ -127,9 +141,11 @@ async def on_ready() -> None:
                 print(f"Didn't load disabled extension {ext}")
                 cogs[ext.replace(".py", "")] = False
 
-            elif se.startswith("Extension 'cogs.") and se.endswith("' is already loaded"):
+            elif se.startswith("Extension 'cogs.") and se.endswith(
+                "' is already loaded"
+            ):
                 continue
-                
+
             else:
                 print(f"Failed to load {ext}")
                 cogs[ext.replace(".py", "")] = False
