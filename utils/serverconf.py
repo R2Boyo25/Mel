@@ -37,7 +37,7 @@ class ServerConf:
 
         return cdb.get(key)
 
-    async def get(
+    async def aget(
         self,
         key: str,
         default: Any = None,
