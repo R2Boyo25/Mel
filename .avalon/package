@@ -1,0 +1,10 @@
+{
+    "author": "R2Boyo25",
+    "repo": "TemplateBot",
+    "binname": "templatebot",
+    "installScript": ".avalon/gen.py",
+    "mvBinAfterInstallScript": true,
+    "toCopy": [
+        "all"
+    ]
+}
