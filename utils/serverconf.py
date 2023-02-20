@@ -37,6 +37,35 @@ class ServerConf:
 
         return cdb.get(key)
 
+    async def get(
+        self,
+        key: str,
+        default: Any = None,
+        preprocess: Optional[Callable[[Any], Any]] = None,
+    ) -> Any:
+        if not os.path.exists(self.confpath):
+            if default is None:
+                raise ValueError(
+                    f"No value set for {key} in {self.guildid} and no default value passed to ServerConf.get()"
+                )
+
+            return default
+
+        cdb = jdb(self.confpath)
+
+        if key not in cdb.keys():
+            if default is None:
+                raise ValueError(
+                    f"No value set for {key} in {self.guildid} and no default value passed to ServerConf.get()"
+                )
+
+            return default
+
+        if preprocess is not None:
+            return await preprocess(cdb.get(key))
+
+        return cdb.get(key)
+    
     def set(self, key: str, value: Any) -> None:
         if not os.path.exists("configs"):
             os.mkdir("configs")

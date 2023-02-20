@@ -54,7 +54,7 @@ class Events(commands.Cog):
         sconf = sc(ctx.guild.id)
 
         joinmessage = sconf.get(
-            "joinmessage",
+            "join.message",
             "Welcome {}! We hope you enjoy your time at {}.".format(
                 ctx.mention, ctx.guild
             ),
@@ -64,7 +64,7 @@ class Events(commands.Cog):
         )
 
         joinurl = sconf.get(
-            "joinurl", "https://media.giphy.com/media/OkJat1YNdoD3W/giphy.gif"
+            "join.url", "https://media.giphy.com/media/OkJat1YNdoD3W/giphy.gif"
         )
 
         embed = discord.Embed(
@@ -86,7 +86,7 @@ class Events(commands.Cog):
         sconf = sc(ctx.guild.id)
 
         leavemessage = sconf.get(
-            "leavemessage",
+            "leave.message",
             "{} has left. We hope you enjoyed your time at {}.".format(
                 ctx.name, ctx.guild
             ),
@@ -96,7 +96,7 @@ class Events(commands.Cog):
         )
 
         leaveurl = sconf.get(
-            "leaveurl", "https://media0.giphy.com/media/26u4b45b8KlgAB7iM/200.gif"
+            "leave.url", "https://media0.giphy.com/media/26u4b45b8KlgAB7iM/200.gif"
         )
 
         embed = discord.Embed(

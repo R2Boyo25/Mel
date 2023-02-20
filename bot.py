@@ -111,6 +111,9 @@ else:
 
 @bot.listen()
 async def on_ready() -> None:
+    if not hasattr(bot, "config_options"):
+        bot.config_options = set()
+    
     errors = []
 
     for _, _, filenames in os.walk("./cogs"):
@@ -169,7 +172,16 @@ async def on_ready() -> None:
 
         del errors[i]
 
+@bot.command("sync", hidden=True)
+@commands.is_owner()
+async def sync_slash_commands(ctx: commands.Context) -> None:
+    synced = await bot.tree.sync()
 
+    if not len(synced):
+        return
+    
+    print("Synced commands:\n\t- " + "\n\t- ".join(map(str, synced)))
+    
 @bot.command("load", hidden=True)
 @commands.is_owner()
 async def loadExtension(ctx: commands.Context, extension: str) -> None:
@@ -397,7 +409,7 @@ async def on_command_error(ctx: commands.Context, error: Exception) -> None:
             return
 
     if str(error) == "MissingPermission":
-        await ctx.send("You don't have permission to do that!")
+        await ctx.send("You don't have permission to do that!", ephemeral=True)
 
     elif (
         str(error).startswith("You are on cooldown. Try again in")
@@ -406,7 +418,7 @@ async def on_command_error(ctx: commands.Context, error: Exception) -> None:
         )
         or str(error).endswith("is a required argument that is missing.")
     ):
-        await ctx.send(error)
+        await ctx.send(error, ephemeral=True)
 
     else:
         tb = "".join(
@@ -420,7 +432,7 @@ async def on_command_error(ctx: commands.Context, error: Exception) -> None:
             description="Users: Check to see if you made any mistakes with your command.\nDevs: Check the log channel for errors.",
             color=0x9C0B21,
         )
-        await ctx.send(embed=embed)
+        await ctx.send(embed=embed, ephemeral=True)
 
         log = bot.get_channel(ErrorChannel)
 

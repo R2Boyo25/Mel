@@ -10,7 +10,7 @@ class GitCog(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
 
-    @commands.command("git")
+    @commands.hybrid_command("git")
     @commands.is_owner()
     async def git(self, ctx: commands.Context, *, command: str) -> None:
         try:
