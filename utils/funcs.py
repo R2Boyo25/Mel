@@ -3,7 +3,7 @@ import json
 from discord.ext import commands  # type: ignore
 from utils.jdb import JSONDatabase as jdb
 from utils.serverconf import ServerConf as sc
-from typing import Any
+from typing import Any, Optional
 
 
 class ConfigError(Exception):
@@ -43,27 +43,23 @@ async def get_prefix(bot: commands.Bot, message: discord.Message) -> Any:
     return commands.when_mentioned_or(*prefixes)(bot, message)
 
 
-def config(key: str) -> Any:
+def config(key: str, default: Optional[Any] = None) -> Any:
     try:
-
         try:
-
             cdb = jdb("config.json")
 
         except:
-
             raise ConfigError("Config improperly formatted")
 
-        try:
-
+        if key in cdb.keys():
             return cdb.get(key)
 
-        except:
+        if default is not None:
+            return default
 
-            raise ConfigError(f"Config missing {key}")
+        raise ConfigError(f"Config missing {key} and no default passed to config()")
 
     except ConfigError as e:
-
         print(e)
         quit()
 

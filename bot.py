@@ -27,8 +27,6 @@ if not os.path.exists("./config.json"):
     )
     quit()
 
-import sys
-
 sys.path = sys.path + ["."]
 
 import traceback
