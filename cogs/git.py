@@ -10,7 +10,8 @@ class GitCog(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
 
-    @commands.hybrid_command("git")
+    @commands.hybrid_command("git", help="Run a git command in the bot's directory.")
+    @discord.app_commands.describe(command="Command to run")
     @commands.is_owner()
     async def git(self, ctx: commands.Context, *, command: str) -> None:
         try:
