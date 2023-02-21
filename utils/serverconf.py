@@ -65,7 +65,7 @@ class ServerConf:
             return await preprocess(cdb.get(key))
 
         return cdb.get(key)
-    
+
     def set(self, key: str, value: Any) -> None:
         if not os.path.exists("configs"):
             os.mkdir("configs")

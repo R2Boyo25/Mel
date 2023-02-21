@@ -5,12 +5,22 @@ from utils.funcs import *
 from utils.jdb import JSONDatabase as jdb
 from utils.serverconf import ServerConf as sc
 
+
 class Events(commands.Cog):
     "Background listeners that allow the bot to do what it does."
 
     def __init__(self, bot: commands.Bot):
         self.bot = bot
-        self.bot.config_options.update(["join.send", "join.message", "join.url", "leave.send", "leave.message", "leave.url"])
+        self.bot.config_options.update(
+            [
+                "join.send",
+                "join.message",
+                "join.url",
+                "leave.send",
+                "leave.message",
+                "leave.url",
+            ]
+        )
 
     @commands.Cog.listener()
     async def on_ready(self) -> None:
@@ -36,7 +46,7 @@ class Events(commands.Cog):
             return
 
         prefix = jdb("prefixes.json").get(str(message.guild.id), config("prefix"))
-        
+
         if str(message.content).replace(" ", "") == self.bot.user.mention:
             await message.channel.send(f"You pinged? do {prefix}help)")
 
@@ -86,7 +96,6 @@ class Events(commands.Cog):
         if not strtobool(sconf.get("leave.send", True)):
             return
 
-        
         leavemessage = sconf.get(
             "leave.message",
             "{} has left. We hope you enjoyed your time at {}.".format(
@@ -145,5 +154,5 @@ async def setup(bot: commands.Bot) -> None:
     @bot.event
     async def on_message(ctx: commands.Context) -> None:
         pass
-    
+
     await bot.add_cog(Events(bot))

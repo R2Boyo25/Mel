@@ -9,6 +9,7 @@ from typing import Any, Optional
 class ConfigError(Exception):
     pass
 
+
 def strtobool(val: str) -> bool:
     """Convert a string representation of truth to true (1) or false (0).
     True values are 'y', 'yes', 't', 'true', 'on', 'ye', 'yep', 'yeah', and '1'; false values
@@ -16,12 +17,15 @@ def strtobool(val: str) -> bool:
     'val' is anything else.
     """
     val = val.lower()
-    if val in ('y', 'yes', 't', 'true', 'on', 'ye', 'yep', 'yeah', '1'):
+    if val in ("y", "yes", "t", "true", "on", "ye", "yep", "yeah", "1"):
         return True
-    elif val in ('n', 'no', 'f', 'false', 'off', 'nope', '0'):
+    elif val in ("n", "no", "f", "false", "off", "nope", "0"):
         return False
     else:
-        raise ValueError("I don't know what '%r' means in the context of yes/no" % (val,))
+        raise ValueError(
+            "I don't know what '%r' means in the context of yes/no" % (val,)
+        )
+
 
 async def get_prefix(bot: commands.Bot, message: discord.Message) -> Any:
 

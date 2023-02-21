@@ -10,12 +10,18 @@ if len(sys.argv) == 1:
 if len(sys.argv) >= 2:
     newdir = os.path.abspath(os.path.expanduser(sys.argv[1]))
     os.system(f'{sys.executable} -m venv "{newdir}/venv"')
-    shutil.copyfile(os.path.dirname(os.path.abspath(__file__)) + "/activate_this.py", newdir + "/venv/bin/activate_this.py")
+    shutil.copyfile(
+        os.path.dirname(os.path.abspath(__file__)) + "/activate_this.py",
+        newdir + "/venv/bin/activate_this.py",
+    )
     sys.path = [newdir] + sys.path
-    exec(open(newdir + "/venv/bin/activate_this.py").read(), {'__file__': newdir + "/venv/bin/activate_this.py"})
+    exec(
+        open(newdir + "/venv/bin/activate_this.py").read(),
+        {"__file__": newdir + "/venv/bin/activate_this.py"},
+    )
     os.chdir(newdir)
-    os.system(f'./venv/bin/pip3 install -r requirements.txt')
-    
+    os.system(f"./venv/bin/pip3 install -r requirements.txt")
+
 if not os.path.exists("./config.json"):
     with open("./config.json", "w") as f:
         f.write(
@@ -111,7 +117,7 @@ else:
 async def on_ready() -> None:
     if not hasattr(bot, "config_options"):
         bot.config_options = set()
-    
+
     errors = []
 
     for _, _, filenames in os.walk("./cogs"):
@@ -170,6 +176,7 @@ async def on_ready() -> None:
 
         del errors[i]
 
+
 @bot.command("sync", hidden=True)
 @commands.is_owner()
 async def sync_slash_commands(ctx: commands.Context) -> None:
@@ -177,9 +184,10 @@ async def sync_slash_commands(ctx: commands.Context) -> None:
 
     if not len(synced):
         return
-    
+
     print("Synced commands:\n\t- " + "\n\t- ".join(map(str, synced)))
-    
+
+
 @bot.command("load", hidden=True)
 @commands.is_owner()
 async def loadExtension(ctx: commands.Context, extension: str) -> None:
