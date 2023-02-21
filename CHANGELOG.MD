@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.0] - 2023-02-20
+
+### Changed
+- Split up config into `set`, `get`, and `list`
+- Allow disabling join and leave messages with `join.send` and `leave.send`
+
 ## [0.1.0] - 2023-02-20
 
 ### Added

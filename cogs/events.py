@@ -10,6 +10,7 @@ class Events(commands.Cog):
 
     def __init__(self, bot: commands.Bot):
         self.bot = bot
+        self.bot.config_options.update(["join.send", "join.message", "join.url", "leave.send", "leave.message", "leave.url"])
 
     @commands.Cog.listener()
     async def on_ready(self) -> None:
@@ -53,6 +54,9 @@ class Events(commands.Cog):
 
         sconf = sc(ctx.guild.id)
 
+        if not strtobool(sconf.get("join.send", True)):
+            return
+
         joinmessage = sconf.get(
             "join.message",
             "Welcome {}! We hope you enjoy your time at {}.".format(
@@ -77,14 +81,12 @@ class Events(commands.Cog):
 
     @commands.Cog.listener()
     async def on_member_remove(self, ctx: commands.Context) -> None:
-        if ctx.guild.system_channel:
-            print(f"Leave_channel found for {ctx.guild}")
-
-        else:
-            print(f"Leave_channel not found for {ctx.guild}: Switching To Backups")
-
         sconf = sc(ctx.guild.id)
 
+        if not strtobool(sconf.get("leave.send", True)):
+            return
+
+        
         leavemessage = sconf.get(
             "leave.message",
             "{} has left. We hope you enjoyed your time at {}.".format(
