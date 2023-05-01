@@ -16,6 +16,9 @@ def strtobool(val: str) -> bool:
     are 'n', 'no', 'f', 'false', 'off', 'nope', and '0'.  Raises ValueError if
     'val' is anything else.
     """
+    if type(val) is bool:
+        return val
+    
     val = val.lower()
     if val in ("y", "yes", "t", "true", "on", "ye", "yep", "yeah", "1"):
         return True
