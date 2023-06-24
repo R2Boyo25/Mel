@@ -10,10 +10,12 @@ if len(sys.argv) == 1:
 if len(sys.argv) >= 2:
     newdir = os.path.abspath(os.path.expanduser(sys.argv[1]))
     os.system(f'{sys.executable} -m venv "{newdir}/venv"')
-    shutil.copyfile(
-        os.path.dirname(os.path.abspath(__file__)) + "/activate_this.py",
-        newdir + "/venv/bin/activate_this.py",
-    )
+    if not os.path.exists(newdir + "/venv/bin/activate_this.py"):
+        shutil.copyfile(
+            os.path.dirname(os.path.abspath(__file__)) + "/activate_this.py",
+            newdir + "/venv/bin/activate_this.py",
+        )
+        
     sys.path = [newdir] + sys.path
     exec(
         open(newdir + "/venv/bin/activate_this.py").read(),
