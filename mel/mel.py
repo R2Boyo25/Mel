@@ -1,5 +1,5 @@
 import json
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 import typing
 
 import discord
@@ -17,7 +17,7 @@ class _ConfigError(Exception):
 @dataclass
 class Mel:
     bot: Bot
-    config_options: set[str] = set()
+    config_options: set[str] = field(default_factory=set)
     mel_config: JSONDatabase = JSONDatabase("config.json")
     error_handler: ErrorHandler = None  # type: ignore
 

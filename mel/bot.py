@@ -26,6 +26,7 @@ bot = commands.Bot(
     intents=intents,
 )
 
+mel_.bot = bot
 bot.mel = mel_  # type: ignore
 
 
@@ -193,8 +194,8 @@ async def reloadAllExtensions(ctx: commands.Context[commands.Bot]) -> None:
             await bot.reload_extension(f"cogs.{ext_import_name}")
             cogs[ext_import_name] = True
 
-        except:
-            pass
+        except Exception as error:
+            await mel_.error_handler.report(error)
 
     await ctx.send(":white_check_mark: Reloaded extensions")
 

@@ -12,7 +12,7 @@ class Events(commands.Cog):
 
     def __init__(self, bot: commands.Bot):
         self.bot = bot
-        self.mel: Mel = bot._mel  # type: ignore
+        self.mel: Mel = bot.mel  # type: ignore
         self.mel.config_options.update(
             [
                 "join.send",

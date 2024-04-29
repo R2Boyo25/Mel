@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import traceback
 import typing
 import logging
@@ -7,13 +9,13 @@ import sentry_sdk
 from discord import TextChannel
 from sentry_sdk.integrations.logging import LoggingIntegration
 
-from mel.mel import Mel
+import mel.mel as mel
 
 
 class ErrorHandler:
     handlers: dict[str, type["ErrorHandler"]] = {}
 
-    def __init__(self, config: dict[str, typing.Any], mel: Mel):
+    def __init__(self, config: dict[str, typing.Any], mel: mel.Mel):
         self.mel = mel
 
     async def report(
@@ -39,11 +41,11 @@ class ErrorHandler:
 
     @classmethod
     def register_handler(cls, name: str, handler: type["ErrorHandler"]) -> None:
-        cls.handlers[name]
+        cls.handlers[name] = handler
 
     @classmethod
     def initialize_handler(
-        cls, config: dict[str, typing.Any], mel: Mel
+        cls, config: dict[str, typing.Any], mel: mel.Mel
     ) -> "ErrorHandler":
         name: str = config["type"]
 
@@ -51,7 +53,7 @@ class ErrorHandler:
 
 
 class DiscordHandler(ErrorHandler):
-    def __init__(self, config: dict[str, typing.Any], mel: Mel):
+    def __init__(self, config: dict[str, typing.Any], mel: mel.Mel):
         self.mel = mel
         self.error_channel = config["error_channel"]
         self.log_channel = config["log_channel"]
@@ -129,21 +131,13 @@ class DiscordHandler(ErrorHandler):
 
 
 class SentryHandler(ErrorHandler):
-    def __init__(self, config: dict[str, typing.Any], mel: Mel):
+    def __init__(self, config: dict[str, typing.Any], mel: mel.Mel):
         self.mel = mel
         config.pop("type")
 
         logging.getLogger("discord").setLevel(logging.INFO)
 
-        sentry_sdk.init(
-            **config,
-            integrations=[
-                LoggingIntegration(
-                    level=logging.INFO,
-                    event_level=logging.INFO,
-                ),
-            ],
-        )
+        sentry_sdk.init(**config)
 
     async def report(
         self,

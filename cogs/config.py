@@ -11,7 +11,7 @@ class Config(commands.Cog):
 
     def __init__(self, bot: commands.Bot):
         self.bot = bot
-        self.mel: Mel = bot._mel  # type: ignore
+        self.mel: Mel = bot.mel  # type: ignore
 
     async def autocomplete_name(
         self, interaction: discord.Interaction, current: str
