@@ -1,0 +1,21 @@
+[tool.poetry]
+name = "mel"
+version = "0.3.0"
+description = ""
+authors = ["Ohin Taylor <kazani@kazani.dev>"]
+license = "MIT"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+"discord.py" = "^2.3.2"
+discord-pretty-help = "^2.0.7"
+sentry-sdk = "^2.0.1"
+
+
+[tool.poetry.group.dev.dependencies]
+mypy = "^1.10.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

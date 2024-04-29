@@ -12,7 +12,7 @@ class JSONDatabase(object):
         if os.path.exists(location):
             self._load()
         else:
-            self.db = {}
+            self.db: dict[Any, Any] = {}
 
     def _load(self) -> None:
         self.db = json.load(open(self.location, "r"))
@@ -20,7 +20,7 @@ class JSONDatabase(object):
     def dumpdb(self) -> None:
         json.dump(self.db, open(self.location, "w+"), indent=4)
 
-    def set(self, key: str, value: Any) -> None:
+    def set(self, key: str | int | float | bool, value: Any) -> None:
         self.db[str(key)] = value
         self.dumpdb()
 

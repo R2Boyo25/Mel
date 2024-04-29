@@ -1,9 +1,10 @@
-import discord  # type: ignore
-import traceback
-import os
-from utils.funcs import *
-from utils.jdb import JSONDatabase as jdb
-from utils.serverconf import ServerConf as sc
+from typing import cast
+import discord
+from discord.ext import commands
+from mel.utils.jdb import JSONDatabase as jdb
+from mel.utils.serverconf import ServerConf as sc
+from mel.utils import strtobool
+from mel import Mel
 
 
 class Events(commands.Cog):
@@ -11,7 +12,8 @@ class Events(commands.Cog):
 
     def __init__(self, bot: commands.Bot):
         self.bot = bot
-        self.bot.config_options.update(
+        self.mel: Mel = bot._mel  # type: ignore
+        self.mel.config_options.update(
             [
                 "join.send",
                 "join.message",
@@ -24,15 +26,11 @@ class Events(commands.Cog):
 
     @commands.Cog.listener()
     async def on_ready(self) -> None:
-        channel = self.bot.get_channel(logChannel)
-        msg = await channel.send("Bot Has Rebooted")
+        await self.mel.error_handler.log("logged in as {}".format(self.bot.user))
 
         users = len(set(self.bot.get_all_members()))
 
-        print("logged in as {}".format(self.bot.user))
-
-        prefix = jdb("prefixes.json").get(str(message.guild.id), config("prefix"))
-        status = f"over {len(self.bot.guilds)} servers, {users} users | {prefix}help"
+        status = f"over {len(self.bot.guilds)} servers, {users} users"
         await self.bot.change_presence(
             activity=discord.Activity(type=discord.ActivityType.watching, name=status)
         )
@@ -45,9 +43,17 @@ class Events(commands.Cog):
         if not message.content:
             return
 
-        prefix = jdb("prefixes.json").get(str(message.guild.id), config("prefix"))
+        if not message.guild:
+            return
 
-        if str(message.content).replace(" ", "") == self.bot.user.mention:
+        prefix = jdb("prefixes.json").get(
+            str(message.guild.id), self.mel.config("default_bot_prefix")
+        )
+
+        if (
+            str(message.content).replace(" ", "")
+            == cast(discord.ClientUser, self.bot.user).mention
+        ):
             await message.channel.send(f"You pinged? do {prefix}help)")
 
         elif not len(message.content) < 2:
@@ -55,9 +61,16 @@ class Events(commands.Cog):
                 await self.bot.process_commands(message)
 
     @commands.Cog.listener()
-    async def on_member_join(self, ctx: commands.Context) -> None:
-        if ctx.guild.system_channel:
-            channel = ctx.guild.system_channel
+    async def on_member_join(self, ctx: commands.Context[commands.Bot]) -> None:
+        channel: discord.TextChannel | discord.User | discord.Member
+
+        if ctx.guild is None:
+            raise NotImplementedError("on_member_join called without a guild")
+
+        guild = ctx.guild
+
+        if guild.system_channel is not None:
+            channel = guild.system_channel
 
         else:
             channel = ctx.author
@@ -69,12 +82,12 @@ class Events(commands.Cog):
 
         joinmessage = sconf.get(
             "join.message",
-            "Welcome {}! We hope you enjoy your time at {}.".format(
-                ctx.mention, ctx.guild
+            "Welcome {}! We hope you enjoy your time in {}.".format(
+                ctx.author.mention, ctx.guild
             ),
-            lambda message: message.replace("member", ctx.mention)
-            .replace("server", str(ctx.guild))
-            .replace("memcount", str(len([x for x in ctx.guild.members]))),
+            lambda message: message.replace("member", ctx.author.mention)
+            .replace("server", guild.name)
+            .replace("memcount", str(len(guild.members))),
         )
 
         joinurl = sconf.get(
@@ -90,20 +103,28 @@ class Events(commands.Cog):
         await channel.send(embed=embed)
 
     @commands.Cog.listener()
-    async def on_member_remove(self, ctx: commands.Context) -> None:
-        sconf = sc(ctx.guild.id)
+    async def on_member_remove(self, ctx: commands.Context[commands.Bot]) -> None:
+        if ctx.guild is None:
+            raise NotImplementedError("on_member_remove called without a guild")
+
+        guild = ctx.guild
+
+        if guild.system_channel is None:
+            return
+
+        sconf = sc(guild.id)
 
         if not strtobool(sconf.get("leave.send", True)):
             return
 
         leavemessage = sconf.get(
             "leave.message",
-            "{} has left. We hope you enjoyed your time at {}.".format(
-                ctx.name, ctx.guild
+            "{} has left. We hope you enjoyed your time in {}.".format(
+                ctx.author.name, ctx.guild
             ),
-            lambda message: message.replace("member", ctx.mention)
-            .replace("server", str(ctx.guild))
-            .replace("memcount", str(len([x for x in ctx.guild.members]))),
+            lambda message: message.replace("member", ctx.author.mention)
+            .replace("server", guild.name)
+            .replace("memcount", str(len(guild.members))),
         )
 
         leaveurl = sconf.get(
@@ -114,45 +135,44 @@ class Events(commands.Cog):
             title="Bye!", description=leavemessage, colour=discord.Color.red()
         )
         embed.set_thumbnail(url=leaveurl)
-        await ctx.guild.system_channel.send(embed=embed)
+        await guild.system_channel.send(embed=embed)
 
-    @commands.Cog.listener()
-    async def on_guild_join(self, guild: discord.Guild) -> None:
-        log = self.bot.get_channel(logChannel)
+    # @commands.Cog.listener()
+    # async def on_guild_join(self, guild: discord.Guild) -> None:
+    #     log = cast(discord.TextChannel, self.bot.get_channel(logChannel))
 
-        embed = discord.Embed(
-            title="Server joined!",
-            description=f"I have been added to **`{guild.name}`**.",
-            color=0x2ECC71,
-        )
+    #     embed = discord.Embed(
+    #         title="Server joined!",
+    #         description=f"I have been added to **`{guild.name}`**.",
+    #         color=0x2ECC71,
+    #     )
 
-        server = guild
+    #     embed.set_footer(
+    #         text=guild.id, icon_url=None if guild.icon is None else guild.icon.url
+    #     )
 
-        embed.set_footer(text=guild.id, icon_url=guild.icon_url)
+    #     embed.add_field(
+    #         name="Created on:",
+    #         value=f"```\n{guild.created_at.strftime('%d %B %Y at %H:%M UTC+3')}```",
+    #         inline=False,
+    #     )
+    #     embed.add_field(name="Server ID:", value=f"```\n{guild.id}```", inline=False)
+    #     embed.add_field(
+    #         name="Users on server:", value=f"```\n{guild.member_count}```", inline=True
+    #     )
+    #     embed.add_field(
+    #         name="Server owner:",
+    #         value=f"```\n{guild.owner} ({None if guild.owner is None else guild.owner.id})```",
+    #         inline=True,
+    #     )
 
-        embed.add_field(
-            name="Created on:",
-            value=f"```\n{server.created_at.strftime('%d %B %Y at %H:%M UTC+3')}```",
-            inline=False,
-        )
-        embed.add_field(name="Server ID:", value=f"```\n{server.id}```", inline=False)
-        embed.add_field(
-            name="Users on server:", value=f"```\n{server.member_count}```", inline=True
-        )
-        embed.add_field(
-            name="Server owner:",
-            value=f"```\n{server.owner} ({server.owner.id})```",
-            inline=True,
-        )
-
-        await log.send(embed=embed)
+    #     await log.send(embed=embed)
 
 
 async def setup(bot: commands.Bot) -> None:
-
     # this is here to prevent the bot from automatically processing commands.
     @bot.event
-    async def on_message(ctx: commands.Context) -> None:
+    async def on_message(ctx: commands.Context[commands.Bot]) -> None:
         pass
 
     await bot.add_cog(Events(bot))

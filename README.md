@@ -2,48 +2,23 @@
 
 ## So, what is Mel and why did you make it?
 
-Mel is a collection of code I extracted from my main discord bot to use 
-to develop my other discord bots on top of.  
-It is designed to allow you to work completely on cogs without touching 
-the bot part of the bot, allowing complete modularity.  
-
-I have not tested this on Windows or Mac but it does work on Gentoo and Debian
-so it should work on most linux systems with a working Python 3 install.  
-It works entirely in a virtual environment and does some *admittedly weird*
-stuff with the virtualenv to load its packages from the existing python interpreter.  
-It then adds the path of your code to itself so that it canload your cogs 
-as if they were part of the bot itself.  
+Mel is a library that I extracted from my first discord bot and have maintained over time.
+It's made up of code that was common to a lot of the discord bots I was making.
 
 ## How do I install it?
-
-The easiest method is to install it using my package manager, 
-[Avalon Package Manager](https://github.com/R2Boyo25/AvalonPackageManager):
-
-```bash
-# install APM
-cd /tmp
-git clone https://github.com/R2Boyo25/AvalonPackageManager apm
-cd apm
-python3 install.py
-cd ..
-rm -r apm
-
-# install Mel
-apm install r2boyo25/mel
-
-# and later, update Mel
-apm update r2boyo25/mel
-```
-
-but I think most people don't want to do that, so you can also just clone the repository:
 
 ```bash
 # Replace the path with the install location for Mel
 git clone https://github.com/R2Boyo25/Mel /path/to/where/you/want/to/install/Mel
 ```
 
+### Configuration
+
+TODO
+
 ## Making your bot
-Like with every bot you first have to make a bot through the Discord Developer Portal,
+
+Like with every bot, you first have to make a bot through the Discord Developer Portal,
 but there's already tutorials on that so you can find out how to do that yourself.  
 You do need to enable the Message Content Intent in the bot for non-slash-commands 
 commands to work.  

@@ -1,6 +1,6 @@
 # Cogs
 
-Mel uses [discord.py's cogs](https://discordpy.readthedocs.io/en/stable/ext/commands/cogs.html) in [extensions](https://discordpy.readthedocs.io/en/stable/ext/commands/extensions.html) to allow your bot to be modular to prevent you from having to restart it when you make changes.
+Mel uses [discord.py's cogs](https://discordpy.readthedocs.io/en/stable/ext/commands/cogs.html) in [extensions](https://discordpy.readthedocs.io/en/stable/ext/commands/extensions.html) to prevent you from having to restart your bot when you make changes.
 
 Mel has certain commands (in Discord) by default:
 - `newext filename`: makes a new file - `cogs/filename.py` and sets up

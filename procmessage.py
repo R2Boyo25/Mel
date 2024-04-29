@@ -1,56 +1,47 @@
-import discord  # type: ignore
 import random
-from utils.funcs import *
-from utils.jdb import JSONDatabase as jdb
+
+import discord
+from discord.ext import commands
+
+from mel.utils.funcs import *
+from mel.utils.jdb import JSONDatabase as jdb
 
 
 async def processMessage(message: discord.Message, bot: commands.Bot) -> None:
-    pass  # remove this line once you add custom handlers
+    ...  # remove this line once you add custom handlers
 
     # add your own message handlers here.
-
-    # Example
-
-    # await xp(message)
+    # await handle_xp(message)
 
 
-# example message handler thing
-async def xp(message: discord.Message) -> None:
-    if len(message.content) > 0:
+async def handle_xp(message: discord.Message) -> None:
+    if len(message.content) > 0 and message.content[0] in "!/\?|.,<{}]-=+":
+        return
 
-        if message.content[0] in "!/\?|.,<{}[]-=+":
-            return
+    def should_rank_up(current_xp: int, rank: int) -> bool:
+        return current_xp >= rank ** (4 if rank < 11 else 3)
 
-    pxp = int(random.randint(5, 20) * 2)
-
+    gained_xp = random.randint(5, 20) * 2
     data = jdb("rank.json")
 
-    a = str(message.author.id)
+    if str(message.author.id) in data.keys():
+        author = data.get(str(message.author.id))
+        current_xp = author["xp"] + gained_xp
+        old_rank: int = author["rank"]
+        rank: int = old_rank
 
-    if a in data.keys():
-        fxp = data.get(a)["xp"] + pxp
-
-        if fxp >= data.get(a)["rank"] ** (4 if data.get(a)["rank"] < 11 else 3):
-            rank = data.get(a)["rank"] + 1
-
-        else:
-            rank = data.get(a)["rank"]
-
-        orank = data.get(a)["rank"]
+        if should_rank_up(current_xp, rank):
+            rank += 1
 
     else:
-
-        orank = 1
-
-        fxp = pxp
-
+        old_rank = 1
+        current_xp = gained_xp
         rank = 1
 
-    if orank < rank:
-
+    if old_rank < rank:
         await message.channel.send(
             f"Congratulations {message.author.mention}! You have leveled up to level {rank-1}!",
             delete_after=120,
         )
 
-    data.set(message.author.id, {"rank": rank, "xp": fxp})
+    data.set(message.author.id, {"rank": rank, "xp": current_xp})

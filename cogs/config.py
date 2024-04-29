@@ -1,10 +1,9 @@
-import discord  # type: ignore
-import os
-from discord.ext import commands  # type: ignore
-from utils.funcs import *
-from utils.jdb import JSONDatabase as jdb
-from utils.serverconf import ServerConf as sc
-from typing import List
+import discord
+from discord.ext import commands
+from mel.utils.jdb import JSONDatabase as jdb
+from mel.utils.serverconf import ServerConf as sc
+from mel import Mel
+from typing import List, cast
 
 
 class Config(commands.Cog):
@@ -12,58 +11,80 @@ class Config(commands.Cog):
 
     def __init__(self, bot: commands.Bot):
         self.bot = bot
+        self.mel: Mel = bot._mel  # type: ignore
 
     async def autocomplete_name(
         self, interaction: discord.Interaction, current: str
     ) -> List[discord.app_commands.Choice[str]]:
         return [
             discord.app_commands.Choice(name=option, value=option)
-            for option in self.bot.config_options
+            for option in self.mel.config_options
             if current.lower() in option.lower()
         ]
 
     @commands.hybrid_group(name="config", fallback="list")
-    async def config(self, ctx: commands.Context) -> None:
+    async def config_group(self, ctx: commands.Context[commands.Bot]) -> None:
         "Configure the bot"
+
+        if ctx.guild is None:
+            raise NotImplementedError("Config called without a guild")
 
         embed = discord.Embed(title=f"Configuration Values for {ctx.guild.name}")
 
         srvcnf = sc(ctx.guild.id)
-        for configkey in self.bot.config_options:
+        for configkey in self.mel.config_options:
             embed.add_field(name=configkey, value=srvcnf.get(configkey, "Not set"))
 
         await ctx.send(embed=embed, ephemeral=True)
 
-    @config.command(name="set", help="Set a config value")
+    @config_group.command(name="set", help="Set a config value")
     @commands.has_permissions(manage_guild=True)
     @discord.app_commands.describe(
         name="The name of the setting to set",
         setting="What to set the setting to. Leaving unspecified resets the setting to default.",
     )
     @discord.app_commands.autocomplete(name=autocomplete_name)
-    async def configset(
-        self, ctx: commands.Context, name: str, setting: str = None
+    async def set_config_value(
+        self, ctx: commands.Context[commands.Bot], name: str, setting: str | None = None
     ) -> None:
+        if ctx.guild is None:
+            raise NotImplementedError("Config called without a guild")
+
         sc(ctx.guild.id).set(name, setting)
         await ctx.send(f"`{name}` has been set to `{setting}`", ephemeral=True)
 
-    @config.command(name="get", help="Get a config's value")
+    @config_group.command(name="get", help="Get a config's value")
     @discord.app_commands.describe(name="The name of the setting to get")
     @discord.app_commands.autocomplete(name=autocomplete_name)
-    async def configget(self, ctx: commands.Context, name: str) -> None:
+    async def get_config_value(
+        self, ctx: commands.Context[commands.Bot], name: str
+    ) -> None:
+        if ctx.guild is None:
+            raise NotImplementedError("Config called without a guild")
+
         await ctx.send(
             sc(ctx.guild.id).get(name, f"`{name}` is not set"), ephemeral=True
         )
 
     @commands.command(name="prefix")
-    async def prefixcom(self, ctx: commands.Context, *, prefix: str = "get") -> None:
+    async def prefixcom(
+        self, ctx: commands.Context[commands.Bot], *, prefix: str = "get"
+    ) -> None:
         "Set or get the server's prefix"
+
+        if ctx.guild is None:
+            raise NotImplementedError("Config called without a guild")
+
         data = jdb("prefixes.json")
 
         if prefix == "get":
             if str(ctx.guild.id) in data.keys():
+                retrieved_prefix = data.get(
+                    str(ctx.guild.id), self.mel.config("default_bot_prefix")
+                )
+
                 await ctx.send(
-                    f"Prefix for **{ctx.guild.name}** is '{data.get(str(ctx.guild.id), config('prefix'))}'"
+                    f"Prefix for **{ctx.guild.name}** is '{retrieved_prefix}'"
                 )
 
             else:
@@ -71,7 +92,7 @@ class Config(commands.Cog):
                     f"**{ctx.guild.name}** does not have a custom prefix yet, set one with `.prefix newprefix`"
                 )
 
-        elif ctx.author.guild_permissions.manage_guild:
+        elif cast(discord.Member, ctx.author).guild_permissions.manage_guild:
             if len(prefix) > 1:
                 await ctx.send(
                     f'The bot does not support prefixes longer than 1 character (as in, the bot breaks), your prefix has been shortened to "{prefix[0]}"'

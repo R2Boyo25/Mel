@@ -6,3 +6,5 @@ discord.txt
 venv
 configs
 .mypy_cache
+poetry.lock
+.venv

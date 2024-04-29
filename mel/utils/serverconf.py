@@ -1,4 +1,4 @@
-from utils.jdb import JSONDatabase as jdb
+from mel.utils.jdb import JSONDatabase as jdb
 import os
 from typing import Any, Callable, Optional
 
