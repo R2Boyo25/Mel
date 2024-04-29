@@ -37,8 +37,7 @@ async def on_ready() -> None:
         extension_paths = filenames
         break
 
-    with open("disabled.txt", "r") as f:
-        disabled_extensions = f.read().strip("\n").split("\n")
+    disabled_extensions = mel_.mel_config.get("disabled", [])
 
     for ext in extension_paths:
         if ext.endswith("~"):
@@ -203,27 +202,25 @@ async def reloadAllExtensions(ctx: commands.Context[commands.Bot]) -> None:
 @bot.command("enableextension", hidden=True)
 @commands.is_owner()
 async def enableExtension(ctx: commands.Context[commands.Bot], ext: str) -> None:
-    with open("disabled.txt", "r") as f:
-        a = f.read().split("\n")
+    disabled: list[str] = mel_.mel_config.get("disabled", [])
 
-    if ext in a:
-        del a[a.index(ext)]
-        with open("disabled.txt", "w") as f:
-            f.write("\n".join(a))
+    if ext not in disabled:
+        return
+
+    disabled.remove(ext)
+    mel_.mel_config.set("disabled", disabled)
 
 
 @bot.command("disableextension", hidden=True)
 @commands.is_owner()
 async def disableExtension(ctx: commands.Context[commands.Bot], ext: str) -> None:
-    with open("disabled.txt", "r") as f:
-        a = f.read().split("\n")
+    disabled: list[str] = mel_.mel_config.get("disabled", [])
 
-    if ext in a:
+    if ext in disabled:
         return
 
-    a.append(ext)
-    with open("disabled.txt", "w") as f:
-        f.write("\n".join(a))
+    disabled.append(ext)
+    mel_.mel_config.set("disabled", disabled)
 
 
 @bot.command("newcog", hidden=True)
@@ -297,7 +294,7 @@ async def on_command_error(
     if hasattr(ctx, "handled") and ctx.handled:
         return
 
-    if type(error) is discord.ext.commands.MissingPermissions:
+    if type(error) is commands.MissingPermissions:
         await ctx.send("You don't have permission to do that!", ephemeral=True)
         return
 
