@@ -3,4 +3,5 @@ RUN mkdir /mel/; mkdir /bot
 COPY . /mel/
 RUN python3 -m venv /bot/venv
 RUN /bot/venv/bin/python -m pip install --no-cache-dir /mel
+WORKDIR /bot
 CMD [ "/bin/bash" "/bot/start.sh" ]
