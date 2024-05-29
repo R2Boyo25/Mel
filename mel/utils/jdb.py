@@ -78,7 +78,7 @@ class JSONDatabase(Generic[T]):
 
 class JSONFile(Generic[T]):
     def __init__(self, location: str):
-        self.location = os.path.expanduser(location)
+        self.location = os.path.expanduser(location + ".json")
         self.db: dict[str, T]
 
         if os.path.exists(self.location):
