@@ -1,11 +1,16 @@
+import asyncio
 from dataclasses import dataclass, field
 import typing
 
 import discord
 from discord.ext import commands
 from discord.ext.commands.bot import Bot
+from hippodb_client import AppID, AuthenticatedHippo, HippoToken
+from pydantic import BaseModel
+from yarl import URL
 
 from mel.utils.jdb import JSONDatabase, JSONFile
+import mel.utils.jdb
 from .errors import ErrorHandler
 
 
@@ -13,11 +18,18 @@ class _ConfigError(Exception):
     pass
 
 
+class HippoDBConfig(BaseModel):
+    url: str
+    app_id: str
+    token: str
+
+
 @dataclass
 class Mel:
     bot: Bot
     config_options: set[str] = field(default_factory=set)
     mel_config: JSONFile[typing.Any] = JSONFile("config")
+    hippodb_config = HippoDBConfig(**mel_config.get("hippdb_config"))
     error_handler: ErrorHandler = None  # type: ignore
 
     def __post_init__(self) -> None:
@@ -67,5 +79,14 @@ class Mel:
         # If we are in a guild, we allow for the user to mention us or use the custom prefix.
         return commands.when_mentioned_or(*prefixes)(self.bot, message)
 
+    async def _init_async(self) -> None:
+        mel.utils.jdb.HIPPODB = await AuthenticatedHippo.create(
+            URL(self.hippodb_config.url),
+            AppID(self.hippodb_config.app_id),
+            HippoToken(self.hippodb_config.token),
+        )
+
+        await self.bot.start(self.config("token"))
+
     def start(self) -> None:
-        self.bot.run(self.config("token"))
+        asyncio.run(self._init_async())
