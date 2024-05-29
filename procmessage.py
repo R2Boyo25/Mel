@@ -3,7 +3,7 @@ import random
 import discord
 from discord.ext import commands
 
-from mel.utils.jdb import JSONDatabase as jdb
+from mel.utils.jdb import JSONDatabase
 
 
 async def processMessage(message: discord.Message, bot: commands.Bot) -> None:
@@ -21,7 +21,7 @@ async def handle_xp(message: discord.Message) -> None:
         return current_xp >= rank ** (4 if rank < 11 else 3)
 
     gained_xp = random.randint(5, 20) * 2
-    data = await jdb("rank").load()
+    data: JSONDatabase[dict[str, int]] = await JSONDatabase.load("rank")
 
     if str(message.author.id) in data.keys():
         author = await data.get(str(message.author.id))

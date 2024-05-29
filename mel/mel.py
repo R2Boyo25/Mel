@@ -53,10 +53,10 @@ class Mel:
             # No prefix in dms
             return []
 
-        prefix_db = await JSONDatabase("prefixes").load()
+        prefix_db: JSONDatabase[list[str] | str] = await JSONDatabase.load("prefixes")
 
         if str(message.guild.id) in prefix_db.keys():
-            prefixes: list[str] | str = await prefix_db.get(str(message.guild.id))
+            prefixes = await prefix_db.get(str(message.guild.id))
 
         elif type(prefix) is list:
             prefixes = prefix

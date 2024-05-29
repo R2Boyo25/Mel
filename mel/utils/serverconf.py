@@ -1,12 +1,9 @@
-from mel.utils.jdb import JSONDatabase
+from mel.utils.jdb import JSONDatabase, T
 import os
-from typing import Any, Callable, Coroutine, Optional, TypeVar
+from typing import Any, Callable, Coroutine, Generic, Optional, TypeVar
 
 
-T = TypeVar("T")
-
-
-class ServerConf:
+class ServerConf(Generic[T]):
     def __init__(self, guildid: int):
         self.guildid = guildid
         self.confpath = f"configs/{guildid}"
@@ -25,7 +22,7 @@ class ServerConf:
 
             return default
 
-        cdb = await JSONDatabase(self.confpath).load()
+        cdb = await JSONDatabase.load(self.confpath)
 
         if key not in cdb.keys():
             if default is None:
@@ -40,7 +37,7 @@ class ServerConf:
 
         return await cdb.get(key)
 
-    async def set(self, key: str, value: Any) -> None:
+    async def set(self, key: str, value: T) -> None:
         if not os.path.exists("configs"):
             os.mkdir("configs")
 
@@ -48,7 +45,7 @@ class ServerConf:
             with open(self.confpath, "w") as f:
                 f.write("{}")
 
-        cdb = await JSONDatabase(self.confpath).load()
+        cdb = await JSONDatabase.load(self.confpath)
 
         if value is None:
             if key in cdb.keys():
