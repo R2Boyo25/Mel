@@ -86,7 +86,11 @@ class Mel:
             HippoToken(self.hippodb_config.token),
         )
 
-        await self.bot.start(self.config("token"))
+        try:
+            await self.bot.start(self.config("token"))
+
+        except KeyboardInterrupt:
+            await mel.utils.jdb.HIPPODB.close()
 
     def start(self) -> None:
         asyncio.run(self._init_async())
