@@ -46,7 +46,7 @@ class Events(commands.Cog):
         if not message.guild:
             return
 
-        prefix = jdb("prefixes.json").get(
+        prefix = jdb("prefixes").get(
             str(message.guild.id), self.mel.config("default_bot_prefix")
         )
 

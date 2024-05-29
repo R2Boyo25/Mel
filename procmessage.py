@@ -3,7 +3,6 @@ import random
 import discord
 from discord.ext import commands
 
-from mel.utils.funcs import *
 from mel.utils.jdb import JSONDatabase as jdb
 
 
@@ -22,10 +21,10 @@ async def handle_xp(message: discord.Message) -> None:
         return current_xp >= rank ** (4 if rank < 11 else 3)
 
     gained_xp = random.randint(5, 20) * 2
-    data = jdb("rank.json")
+    data = await jdb("rank").load()
 
     if str(message.author.id) in data.keys():
-        author = data.get(str(message.author.id))
+        author = await data.get(str(message.author.id))
         current_xp = author["xp"] + gained_xp
         old_rank: int = author["rank"]
         rank: int = old_rank
@@ -44,4 +43,4 @@ async def handle_xp(message: discord.Message) -> None:
             delete_after=120,
         )
 
-    data.set(message.author.id, {"rank": rank, "xp": current_xp})
+    await data.set(message.author.id, {"rank": rank, "xp": current_xp})

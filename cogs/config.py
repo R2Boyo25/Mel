@@ -75,7 +75,7 @@ class Config(commands.Cog):
         if ctx.guild is None:
             raise NotImplementedError("Config called without a guild")
 
-        data = jdb("prefixes.json")
+        data = jdb("prefixes")
 
         if prefix == "get":
             if str(ctx.guild.id) in data.keys():

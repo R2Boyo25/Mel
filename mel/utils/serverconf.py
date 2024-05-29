@@ -1,19 +1,22 @@
-from mel.utils.jdb import JSONDatabase as jdb
+from mel.utils.jdb import JSONDatabase
 import os
-from typing import Any, Callable, Optional
+from typing import Any, Callable, Coroutine, Optional, TypeVar
+
+
+T = TypeVar("T")
 
 
 class ServerConf:
     def __init__(self, guildid: int):
         self.guildid = guildid
-        self.confpath = f"configs/{guildid}.json"
+        self.confpath = f"configs/{guildid}"
 
-    def get(
+    async def get(
         self,
         key: str,
-        default: Any = None,
-        preprocess: Optional[Callable[[Any], Any]] = None,
-    ) -> Any:
+        default: T | None = None,
+        preprocess: Optional[Callable[[Any], Coroutine[Any, Any, T]]] = None,
+    ) -> T:
         if not os.path.exists(self.confpath):
             if default is None:
                 raise ValueError(
@@ -22,36 +25,7 @@ class ServerConf:
 
             return default
 
-        cdb = jdb(self.confpath)
-
-        if key not in cdb.keys():
-            if default is None:
-                raise ValueError(
-                    f"No value set for {key} in {self.guildid} and no default value passed to ServerConf.get()"
-                )
-
-            return default
-
-        if preprocess is not None:
-            return preprocess(cdb.get(key))
-
-        return cdb.get(key)
-
-    async def aget(
-        self,
-        key: str,
-        default: Any = None,
-        preprocess: Optional[Callable[[Any], Any]] = None,
-    ) -> Any:
-        if not os.path.exists(self.confpath):
-            if default is None:
-                raise ValueError(
-                    f"No value set for {key} in {self.guildid} and no default value passed to ServerConf.get()"
-                )
-
-            return default
-
-        cdb = jdb(self.confpath)
+        cdb = await JSONDatabase(self.confpath).load()
 
         if key not in cdb.keys():
             if default is None:
@@ -64,9 +38,9 @@ class ServerConf:
         if preprocess is not None:
             return await preprocess(cdb.get(key))
 
-        return cdb.get(key)
+        return await cdb.get(key)
 
-    def set(self, key: str, value: Any) -> None:
+    async def set(self, key: str, value: Any) -> None:
         if not os.path.exists("configs"):
             os.mkdir("configs")
 
@@ -74,11 +48,12 @@ class ServerConf:
             with open(self.confpath, "w") as f:
                 f.write("{}")
 
-        cdb = jdb(self.confpath)
+        cdb = await JSONDatabase(self.confpath).load()
 
         if value is None:
             if key in cdb.keys():
-                cdb.delete(key)
+                await cdb.delete(key)
+
             return
 
-        cdb.set(key, value)
+        await cdb.set(key, value)

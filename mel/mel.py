@@ -1,4 +1,3 @@
-import json
 from dataclasses import dataclass, field
 import typing
 
@@ -6,7 +5,7 @@ import discord
 from discord.ext import commands
 from discord.ext.commands.bot import Bot
 
-from mel.utils.jdb import JSONDatabase
+from mel.utils.jdb import JSONDatabase, JSONFile
 from .errors import ErrorHandler
 
 
@@ -18,7 +17,7 @@ class _ConfigError(Exception):
 class Mel:
     bot: Bot
     config_options: set[str] = field(default_factory=set)
-    mel_config: JSONDatabase = JSONDatabase("config.json")
+    mel_config: JSONFile = JSONFile("config")
     error_handler: ErrorHandler = None  # type: ignore
 
     def __post_init__(self) -> None:
@@ -54,18 +53,16 @@ class Mel:
             # No prefix in dms
             return []
 
-        with open("prefixes.json") as json_file:
-            keys = json.load(json_file)
+        prefix_db = await JSONDatabase("prefixes").load()
 
-        if str(message.guild.id) in keys:
-            prefixes = keys[str(message.guild.id)]
+        if str(message.guild.id) in prefix_db.keys():
+            prefixes: list[str] | str = await prefix_db.get(str(message.guild.id))
+
+        elif type(prefix) is list:
+            prefixes = prefix
 
         else:
-            if type(prefix) is list:
-                prefixes = [i for i in prefix]
-
-            else:
-                prefixes = [prefix]
+            prefixes = [prefix]  # type: ignore
 
         # If we are in a guild, we allow for the user to mention us or use the custom prefix.
         return commands.when_mentioned_or(*prefixes)(self.bot, message)
