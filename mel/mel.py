@@ -29,7 +29,7 @@ class Mel:
     bot: Bot
     config_options: set[str] = field(default_factory=set)
     mel_config: JSONFile[typing.Any] = JSONFile("config")
-    hippodb_config = HippoDBConfig(**mel_config.get("hippdb_config"))
+    hippodb_config = HippoDBConfig(**mel_config.get("hippodb_config"))
     error_handler: ErrorHandler = None  # type: ignore
 
     def __post_init__(self) -> None:
