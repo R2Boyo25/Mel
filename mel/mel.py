@@ -17,7 +17,7 @@ class _ConfigError(Exception):
 class Mel:
     bot: Bot
     config_options: set[str] = field(default_factory=set)
-    mel_config: JSONFile = JSONFile("config")
+    mel_config: JSONFile[typing.Any] = JSONFile("config")
     error_handler: ErrorHandler = None  # type: ignore
 
     def __post_init__(self) -> None:

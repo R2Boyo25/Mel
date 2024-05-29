@@ -22,7 +22,7 @@ class ServerConf(Generic[T]):
 
             return default
 
-        cdb = await JSONDatabase.load(self.confpath)
+        cdb: JSONDatabase[T] = await JSONDatabase.load(self.confpath)
 
         if key not in cdb.keys():
             if default is None:
@@ -45,7 +45,7 @@ class ServerConf(Generic[T]):
             with open(self.confpath, "w") as f:
                 f.write("{}")
 
-        cdb = await JSONDatabase.load(self.confpath)
+        cdb: JSONDatabase[T] = await JSONDatabase.load(self.confpath)
 
         if value is None:
             if key in cdb.keys():
