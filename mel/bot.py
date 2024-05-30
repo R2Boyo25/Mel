@@ -9,9 +9,10 @@ from typing import Any
 
 # default imports for new extensions/cogs
 imports = """import discord
-from discord.ext import commands
-from utils.funcs import *
-from utils.jdb   import JSONDatabase as jdb"""
+from discord.ext          import commands
+from mel.utils.funcs      import *
+from mel.utils.jdb        import JSONDatabase
+from mel.utils.serverconf import ServerConf"""
 
 cogs: dict[str, bool] = {}
 

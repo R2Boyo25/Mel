@@ -1,7 +1,7 @@
 import discord
 from discord.ext import commands
-from mel.utils.jdb import JSONDatabase as jdb
-from mel.utils.serverconf import ServerConf as sc
+from mel.utils.jdb import JSONDatabase
+from mel.utils.serverconf import ServerConf
 from mel import Mel
 from typing import List, cast
 
@@ -31,9 +31,11 @@ class Config(commands.Cog):
 
         embed = discord.Embed(title=f"Configuration Values for {ctx.guild.name}")
 
-        srvcnf = sc(ctx.guild.id)
+        srvcnf = ServerConf(ctx.guild.id)
         for configkey in self.mel.config_options:
-            embed.add_field(name=configkey, value=srvcnf.get(configkey, "Not set"))
+            embed.add_field(
+                name=configkey, value=await srvcnf.get(configkey, "Not set")
+            )
 
         await ctx.send(embed=embed, ephemeral=True)
 
@@ -50,7 +52,7 @@ class Config(commands.Cog):
         if ctx.guild is None:
             raise NotImplementedError("Config called without a guild")
 
-        sc(ctx.guild.id).set(name, setting)
+        await ServerConf(ctx.guild.id).set(name, setting)
         await ctx.send(f"`{name}` has been set to `{setting}`", ephemeral=True)
 
     @config_group.command(name="get", help="Get a config's value")
@@ -63,7 +65,8 @@ class Config(commands.Cog):
             raise NotImplementedError("Config called without a guild")
 
         await ctx.send(
-            sc(ctx.guild.id).get(name, f"`{name}` is not set"), ephemeral=True
+            await ServerConf(ctx.guild.id).get(name, f"`{name}` is not set"),
+            ephemeral=True,
         )
 
     @commands.command(name="prefix")
@@ -75,11 +78,11 @@ class Config(commands.Cog):
         if ctx.guild is None:
             raise NotImplementedError("Config called without a guild")
 
-        data = jdb("prefixes")
+        data = await JSONDatabase.load("prefixes")
 
         if prefix == "get":
             if str(ctx.guild.id) in data.keys():
-                retrieved_prefix = data.get(
+                retrieved_prefix = await data.get(
                     str(ctx.guild.id), self.mel.config("default_bot_prefix")
                 )
 
@@ -97,7 +100,7 @@ class Config(commands.Cog):
                 await ctx.send(
                     f'The bot does not support prefixes longer than 1 character (as in, the bot breaks), your prefix has been shortened to "{prefix[0]}"'
                 )
-            data.set(str(ctx.guild.id), prefix[0])
+            await data.set(str(ctx.guild.id), prefix[0])
 
         else:
             await ctx.send("You do not have permission to change this server's prefix.")

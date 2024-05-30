@@ -33,7 +33,7 @@ class ServerConf(Generic[T]):
             return default
 
         if preprocess is not None:
-            return await preprocess(cdb.get(key))
+            return await preprocess(await cdb.get(key))
 
         return await cdb.get(key)
 

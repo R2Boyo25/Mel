@@ -1,7 +1,7 @@
 from typing import cast
 import discord
 from discord.ext import commands
-from mel.utils.jdb import JSONDatabase as jdb
+from mel.utils.jdb import JSONDatabase as JSONDatabase
 from mel.utils.serverconf import ServerConf as sc
 from mel.utils import strtobool
 from mel import Mel
@@ -46,7 +46,7 @@ class Events(commands.Cog):
         if not message.guild:
             return
 
-        prefix = jdb("prefixes").get(
+        prefix = await (await JSONDatabase.load("prefixes")).get(
             str(message.guild.id), self.mel.config("default_bot_prefix")
         )
 
@@ -77,10 +77,10 @@ class Events(commands.Cog):
 
         sconf = sc(ctx.guild.id)
 
-        if not strtobool(sconf.get("join.send", True)):
+        if not strtobool(await sconf.get("join.send", True)):
             return
 
-        joinmessage = sconf.get(
+        joinmessage = await sconf.get(
             "join.message",
             "Welcome {}! We hope you enjoy your time in {}.".format(
                 ctx.author.mention, ctx.guild
@@ -90,7 +90,7 @@ class Events(commands.Cog):
             .replace("memcount", str(len(guild.members))),
         )
 
-        joinurl = sconf.get(
+        joinurl = await sconf.get(
             "join.url", "https://media.giphy.com/media/OkJat1YNdoD3W/giphy.gif"
         )
 
@@ -114,10 +114,10 @@ class Events(commands.Cog):
 
         sconf = sc(guild.id)
 
-        if not strtobool(sconf.get("leave.send", True)):
+        if not strtobool(await sconf.get("leave.send", True)):
             return
 
-        leavemessage = sconf.get(
+        leavemessage = await sconf.get(
             "leave.message",
             "{} has left. We hope you enjoyed your time in {}.".format(
                 ctx.author.name, ctx.guild
@@ -127,7 +127,7 @@ class Events(commands.Cog):
             .replace("memcount", str(len(guild.members))),
         )
 
-        leaveurl = sconf.get(
+        leaveurl = await sconf.get(
             "leave.url", "https://media0.giphy.com/media/26u4b45b8KlgAB7iM/200.gif"
         )
 
