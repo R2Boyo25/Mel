@@ -328,9 +328,7 @@ async def on_command_error(
 
 
 @bot.event
-async def on_error(
-    ctx: commands.Context[commands.Bot], *args: Any, **kwargs: Any
-) -> None:
+async def on_error(event_name, *args: Any, **kwargs: Any) -> None:
     info = sys.exc_info()
 
     if info[1] is None:
@@ -338,6 +336,9 @@ async def on_error(
 
     await mel_.error_handler.report(
         info[1],
-        context={"content": ctx.message.content},
-        user={"id": ctx.author.id, "username": ctx.author.name},
+        context={
+            "event_name": event_name,
+            **{k: str(v) for k, v in kwargs.items()},
+            **dict((str(i), str(v)) for i, v in enumerate(args)),
+        },
     )
