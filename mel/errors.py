@@ -137,7 +137,7 @@ class SentryHandler(ErrorHandler):
 
         logging.getLogger("discord").setLevel(logging.INFO)
 
-        sentry_sdk.init(**config)
+        sentry_sdk.init(**config, enable_tracing=True)
 
     async def report(
         self,

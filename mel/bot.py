@@ -2,7 +2,7 @@ import os
 import sys
 import discord
 from discord.ext import commands
-from pretty_help import PrettyHelp  # type: ignore
+from pretty_help import PrettyHelp
 from mel import Mel
 from typing import Any
 
