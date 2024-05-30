@@ -20,7 +20,7 @@ class JSONDatabase(Generic[T]):
 
     @classmethod
     async def load(cls, location: str) -> Self:
-        self = cls()
+        self = cls(_is_from_internal=True)
 
         location = location.replace("~/", "")
         self.database_path = "/" + "/".join(location.split("/")[:-1])
